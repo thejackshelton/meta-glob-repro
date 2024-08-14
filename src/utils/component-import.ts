@@ -9,10 +9,11 @@ export const metaGlobComponents: Record<string, any> = import.meta.glob(
   }
 );
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const rawComponents: Record<string, any> = import.meta.glob(
   "/src/routes/**/examples/*.tsx",
   {
-    query: "?raw",
+    query: "raw",
     import: "default",
     eager: false,
   }
