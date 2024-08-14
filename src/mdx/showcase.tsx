@@ -5,8 +5,8 @@ import {
   useSignal,
   useTask$,
 } from "@builder.io/qwik";
-import { Tabs } from "@qwik-ui/headless";
-import { metaGlobComponents } from "~/utils/component-import";
+import { Collapsible, Tabs } from "@qwik-ui/headless";
+import { metaGlobComponents, rawComponents } from "~/utils/component-import";
 
 import { Highlight } from "./highlight";
 import { isDev } from "@builder.io/qwik/build";
@@ -22,21 +22,25 @@ export const Showcase = component$<ShowcaseProps>(({ name, ...props }) => {
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const MetaGlobComponentSig = useSignal<Component<any>>();
-  const componentCodeSig = useSignal<string>();
+  const componentCodeSig = useSignal<string>("");
 
   useTask$(async () => {
     MetaGlobComponentSig.value = isDev
       ? await metaGlobComponents[componentPath]() // We need to call `await metaGlobComponents[componentPath]()` in development as it is `eager:false`
       : metaGlobComponents[componentPath]; // We need to directly access the `metaGlobComponents[componentPath]` expression in preview/production as it is `eager:true`
+
+    componentCodeSig.value = isDev
+      ? await rawComponents[componentPath]()
+      : rawComponents[componentPath];
   });
 
   return (
-    <Tabs.Root {...props}>
-      <Tabs.List class="mt-4 flex flex-row gap-6">
+    <Tabs.Root>
+      <Tabs.List>
         <Tabs.Tab>Preview</Tabs.Tab>
-        <Tabs.Tab>Code</Tabs.Tab>
+        <Tabs.Tab>Code (shiki)</Tabs.Tab>
       </Tabs.List>
-      <Tabs.Panel class="mt-5 rounded-lg border p-8 shadow-sm">
+      <Tabs.Panel>
         <section class="flex flex-col items-center">
           {MetaGlobComponentSig.value && <MetaGlobComponentSig.value />}
         </section>
